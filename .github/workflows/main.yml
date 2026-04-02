@@ -11,15 +11,17 @@ jobs:
       - name: Setup Theos
         run: |
           git clone --recursive https://github.com/theos/theos.git ~/theos
-          # تحميل الـ SDK الخاص بالأيفون بشكل مباشر
-          curl -LO https://github.com/theos/sdks/raw/master/iPhoneOS14.5.sdk.tar.xz
+          # استخدام رابط SDK مباشر ومستقر
+          curl -L https://github.com/theos/sdks/raw/master/iPhoneOS14.5.sdk.tar.xz -o ~/iPhoneOS14.5.sdk.tar.xz
           mkdir -p ~/theos/sdks
-          tar -xvf iPhoneOS14.5.sdk.tar.xz -C ~/theos/sdks
+          tar -xf ~/iPhoneOS14.5.sdk.tar.xz -C ~/theos/sdks
           echo "THEOS=~/theos" >> $GITHUB_ENV
 
       - name: Build Tweak
         run: |
           export THEOS=~/theos
+          # تنظيف البناء القديم قبل البدء
+          make clean
           make package FINALPACKAGE=1
           
       - name: Upload Artifact

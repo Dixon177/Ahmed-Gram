@@ -1,0 +1,9 @@
+Package: com.ahmed.ahmedgram
+Name: Ahmed-Gram
+Depends: mobilesubstrate
+Version: 1.0.0
+Architecture: iphoneos-arm
+Description: نسخة انستقرام معدلة باسم المطور أحمد @7btl0
+Maintainer: AHMED <7btl0@ahmed.com>
+Author: AHMED
+Section: Tweaks

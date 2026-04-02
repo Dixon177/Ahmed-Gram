@@ -1,25 +1,16 @@
-name: Build-AhmedGram
+name: build
 on: [push, workflow_dispatch]
-
 jobs:
   build:
     runs-on: macos-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Theos and Build
+      - uses: actions/checkout@v4
+      - name: Setup
         uses: theos/setup-theos-action@v1
-        with:
-          theos-src: https://github.com/theos/theos.git
-          theos-sdks: https://github.com/theos/sdks.git
-
-      - name: Build Package
-        run: |
-          make package FINALPACKAGE=1
-          
-      - name: Upload Artifact
+      - name: Build
+        run: make package FINALPACKAGE=1
+      - name: Private
         uses: actions/upload-artifact@v4
         with:
-          name: Ahmed-Gram-Tweak
+          name: AhmedGram
           path: packages/*.deb

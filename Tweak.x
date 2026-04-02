@@ -1,52 +1,58 @@
 #import <UIKit/UIKit.h>
 
-@interface AhmedCell : UITableViewCell
-@property (nonatomic, strong) UIImageView *pic;
-@property (nonatomic, strong) UILabel *name;
-@property (nonatomic, strong) UILabel *role;
+// تعريف الخلايا للأزرار الجديدة
+@interface AhmedFeatureCell : UITableViewCell
 @end
-
-@implementation AhmedCell
-- (instancetype)initWithStyle:(UITableViewCellStyle)s reuseIdentifier:(NSString *)r {
-    self = [super initWithStyle:s reuseIdentifier:r];
+@implementation AhmedFeatureCell
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    self = [super initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:reuseIdentifier];
     if (self) {
-        self.backgroundColor = [UIColor clearColor];
-        self.pic = [[UIImageView alloc] initWithFrame:CGRectMake(15, 10, 60, 60)];
-        self.pic.layer.cornerRadius = 30;
-        self.pic.layer.masksToBounds = YES;
-        self.pic.contentMode = UIViewContentModeScaleAspectFill;
-        // هنا الكود راح يندل صورتك بالاسم اللي رفعته إنت
-        self.pic.image = [UIImage imageWithContentsOfFile:@"/Library/Application Support/AhmedGram/IMG_1099.png"];
-        [self.contentView addSubview:self.pic];
-
-        self.role = [[UILabel alloc] initWithFrame:CGRectMake(90, 15, 100, 20)];
-        self.role.text = @"المطور";
-        self.role.textColor = [UIColor redColor];
-        self.role.font = [UIFont boldSystemFontOfSize:14];
-        [self.contentView addSubview:self.role];
-
-        self.name = [[UILabel alloc] initWithFrame:CGRectMake(90, 35, 200, 30)];
-        self.name.text = @"أحمد - @7btl0";
-        self.name.textColor = [UIColor whiteColor];
-        self.name.font = [UIFont boldSystemFontOfSize:18];
-        [self.contentView addSubview:self.name];
+        self.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        self.detailTextLabel.textColor = [UIColor grayColor];
     }
     return self;
 }
 @end
 
 %hook IGSettingsViewController
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tv { return %orig + 1; }
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tv {
+    return %orig + 2; // قسم للمطور وقسم للميزات
+}
+
 - (NSInteger)tableView:(UITableView *)tv numberOfRowsInSection:(NSInteger)s {
-    if (s == 0) return 1;
-    return %orig(s - 1);
+    if (s == 0) return 1; // خلية المطور أحمد
+    if (s == 1) return 4; // الأزرار: وضع الشبح، التحميل، الخ..
+    return %orig(s - 2);
 }
+
 - (UITableViewCell *)tableView:(UITableView *)tv cellForRowAtIndexPath:(NSIndexPath *)ip {
-    if (ip.section == 0) return [[AhmedCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Ah"];
-    return %orig(tv, [NSIndexPath indexPathForRow:ip.row inSection:ip.section - 1]);
+    if (ip.section == 0) {
+        // خلية المطور اللي سويناها قبل
+        return [self AhmedDevCell]; 
+    }
+    
+    if (ip.section == 1) {
+        AhmedFeatureCell *cell = [tv dequeueReusableCellWithIdentifier:@"FeatureCell"];
+        if (!cell) cell = [[AhmedFeatureCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"FeatureCell"];
+        
+        if (ip.row == 0) {
+            cell.textLabel.text = @"وضع الشبح";
+            cell.detailTextLabel.text = @"مشاهدة الرسائل والقصص بشكل مخفي";
+            cell.imageView.image = [UIImage systemImageNamed:@"ghost"];
+        } else if (ip.row == 1) {
+            cell.textLabel.text = @"التحميل";
+            cell.detailTextLabel.text = @"تحميل الريلز والمنشورات والقصص";
+            cell.imageView.image = [UIImage systemImageNamed:@"arrow.down.circle"];
+        }
+        return cell;
+    }
+    return %orig(tv, [NSIndexPath indexPathForRow:ip.row inSection:ip.section - 2]);
 }
-- (CGFloat)tableView:(UITableView *)tv heightForRowAtIndexPath:(NSIndexPath *)ip {
-    if (ip.section == 0) return 85;
-    return %orig;
+
+// عنوان الأقسام
+- (NSString *)tableView:(UITableView *)tv titleForHeaderInSection:(NSInteger)s {
+    if (s == 1) return @"إعدادات Ahmed-Gram";
+    return %orig(s - 2);
 }
 %end
